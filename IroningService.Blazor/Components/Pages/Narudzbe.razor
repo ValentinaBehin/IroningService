@@ -1,0 +1,59 @@
+@page "/narudzbe"
+@using IroningService.Domena.Entiteti
+@using IroningService.Servis.Suclja
+@inject INarudzbaServis NarudzbaServis
+
+<PageTitle>Narudžbe</PageTitle>
+
+<h3>Popis narudžbi</h3>
+
+@if (narudzbe == null)
+{
+    <p><em>Učitavanje narudžbi...</em></p>
+}
+else if (!narudzbe.Any())
+{
+    <p>Trenutno nema aktivnih narudžbi.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Ukupna Cijena</th>
+                <th>Datum</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var narudzba in narudzbe)
+            {
+                <tr>
+                    <td>@narudzba.Id</td>
+                    <td>@narudzba.UkupnaCijena.ToString("C2")</td>
+                    <td>@narudzba.DatumNarudzbe.ToShortDateString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<Narudzba>? narudzbe;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await OsvjeziNarudzbe();
+    }
+public async Task OsvjeziNarudzbe()
+    {
+        try
+        {
+            narudzbe = await NarudzbaServis.DohvatiSveNarudzbeAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Greška pri učitavanju narudžbi: {ex.Message}");
+        }
+    }
+}

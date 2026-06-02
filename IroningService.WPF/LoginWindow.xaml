@@ -1,0 +1,15 @@
+<Window x:Class="IroningService.WPF.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Prijava" Height="300" Width="400" WindowStartupLocation="CenterScreen">
+    <StackPanel Margin="20" VerticalAlignment="Center">
+        <TextBlock Text="Email:" Margin="0,0,0,5"/>
+        <TextBox x:Name="txtEmail" Height="30"/>
+        
+        <TextBlock Text="Lozinka:" Margin="0,10,0,5"/>
+        <PasswordBox x:Name="txtLozinka" Height="30"/>
+        
+        <Button x:Name="btnPrijava" Content="Prijava" Margin="0,20,0,10" Height="40" Click="BtnPrijava_Click"/>
+        <Button x:Name="btnRegistracija" Content="Nemaš račun? Registriraj se" Click="BtnRegistracija_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
+    </StackPanel>
+</Window>

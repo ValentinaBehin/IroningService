@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="IroningService.API/IroningService.API.csproj" />
+  <Project Path="IroningService.Blazor/IroningService.Blazor.csproj" />
   <Project Path="IroningService.Domena/IroningService.Domena.csproj" />
   <Project Path="IroningService.Repozitorij/IroningService.Repozitorij.csproj" />
   <Project Path="IroningService.Servis/IroningService.Servis.csproj" />

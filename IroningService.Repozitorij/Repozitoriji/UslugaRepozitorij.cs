@@ -18,4 +18,8 @@ public class UslugaRepozitorij : IUslugaRepozitorij
     {
         return await _context.Usluge.ToListAsync();
     }
+    public async Task<UslugaPeglanja?> GetByIdAsync(int id)
+    {
+        return await _context.Usluge.FindAsync(id);
+    }
 }

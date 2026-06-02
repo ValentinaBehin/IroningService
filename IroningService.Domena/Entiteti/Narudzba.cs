@@ -1,9 +1,15 @@
+using IroningService.Domena.Entiteti;
+
 namespace IroningService.Domena.Entiteti;
 
 public class Narudzba
 {
-    public Guid Id { get; set; }
-    public DateTime DatumKreiranja { get; set; }
-    public string Status { get; set; } = "Zaprimljeno";
-    public ICollection<UslugaPeglanja> Usluge { get; set; } = new List<UslugaPeglanja>();
+    public int Id { get; set; }
+    public string KlijentEmail { get; set; } = string.Empty;
+    public DateTime DatumNarudzbe { get; set; }
+    public DateTime TerminDostave { get; set; }
+    public string Adresa { get; set; } = string.Empty;
+    public bool PotrebnaDostava { get; set; }
+    public decimal UkupnaCijena { get; set; }
+    public List<StavkaNarudzbe> Stavke { get; set; } = new();
 }
