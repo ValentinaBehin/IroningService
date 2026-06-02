@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="IroningService.API/IroningService.API.csproj" />
+  <Project Path="IroningService.Domena/IroningService.Domena.csproj" />
+  <Project Path="IroningService.Repozitorij/IroningService.Repozitorij.csproj" />
+  <Project Path="IroningService.Servis/IroningService.Servis.csproj" />
+  <Project Path="IroningService.Testovi/IroningService.Testovi.csproj" />
+</Solution>
