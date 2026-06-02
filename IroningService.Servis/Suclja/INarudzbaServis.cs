@@ -4,7 +4,7 @@ namespace IroningService.Servis.Suclja;
 
 public interface INarudzbaServis
 {
-    Task<IEnumerable<Narudzba>> DohvatiSveNarudzbeAsync(); // Dodaj ovo
-    Task<decimal> IzracunajUkupnuCijenu(List<StavkaNarudzbe> stavke);
+    Task<IEnumerable<Narudzba>> DohvatiSveNarudzbeAsync();
     Task KreirajNarudzbu(Narudzba narudzba);
+    Task<List<Narudzba>> DohvatiNarudzbePoEmailuAsync(string email); // Dodano
 }
