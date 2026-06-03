@@ -6,4 +6,5 @@ public interface IKorisnikRepozitorij
 {
     Task DodajKorisnikaAsync(Korisnik korisnik);
     Task<Korisnik?> ProvjeriPrijavu(string email, string lozinka);
+    Task<Korisnik?> GetByEmailAsync(string email);
 }

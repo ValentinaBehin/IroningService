@@ -5,5 +5,6 @@ namespace IroningService.Servis.Suclja;
 public interface IKorisnikServis
 {
     Task RegistrirajKorisnika(Korisnik korisnik);
+    Task<Korisnik?> DohvatiKorisnikaAsync(string email);
     Task<Korisnik?> Prijava(string email, string lozinka);
 }

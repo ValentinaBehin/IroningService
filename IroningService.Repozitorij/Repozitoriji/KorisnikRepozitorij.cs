@@ -9,7 +9,15 @@ public class KorisnikRepozitorij : IKorisnikRepozitorij
 {
     private readonly RepozitorijContext _context;
 
-    public KorisnikRepozitorij(RepozitorijContext context) => _context = context;
+    public KorisnikRepozitorij(RepozitorijContext context) 
+    {
+        _context = context;
+    }
+
+    public async Task<Korisnik?> GetByEmailAsync(string email)
+    {
+        return await _context.Korisnici.FirstOrDefaultAsync(k => k.Email == email);
+    }
 
     public async Task DodajKorisnikaAsync(Korisnik korisnik)
     {

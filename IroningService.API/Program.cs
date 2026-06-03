@@ -8,6 +8,11 @@ using IroningService.Blazor.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 1. LOGGING (Dolazi s builderom, ali ga možemo dodatno konfigurirati)
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 // Baza podataka
 builder.Services.AddDbContext<RepozitorijContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -20,12 +25,12 @@ builder.Services.AddScoped(sp => new HttpClient {
 // REGISTRACIJA REPOZITORIJA
 builder.Services.AddScoped<IUslugaRepozitorij, UslugaRepozitorij>();
 builder.Services.AddScoped<INarudzbaRepozitorij, NarudzbaRepozitorij>();
-builder.Services.AddScoped<IKorisnikRepozitorij, KorisnikRepozitorij>(); // Dodano
+builder.Services.AddScoped<IKorisnikRepozitorij, KorisnikRepozitorij>();
 
 // REGISTRACIJA SERVISA
 builder.Services.AddScoped<IUslugaServis, UslugaServis>();
 builder.Services.AddScoped<INarudzbaServis, NarudzbaServis>();
-builder.Services.AddScoped<IKorisnikServis, KorisnikServis>(); // Dodano
+builder.Services.AddScoped<IKorisnikServis, KorisnikServis>();
 
 // Blazor i Kontroleri
 builder.Services.AddRazorComponents()
@@ -33,17 +38,29 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddControllers();
 
-
 var app = builder.Build();
+
+// 2. ERROR HANDLING MIDDLEWARE
+// U razvojnom okruženju detaljan error page, u produkciji generički
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    app.UseHsts();
+}
+else
+{
+    app.UseDeveloperExceptionPage();
+}
+
+// Inicijalizacija baze
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<RepozitorijContext>();
-    // Osiguraj da je baza kreirana
     context.Database.EnsureCreated(); 
-    // Pokreni punjenje podataka
     DataSeeder.SeedUsluge(context);
 }
 
+app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
