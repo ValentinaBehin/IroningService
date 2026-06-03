@@ -1,5 +1,6 @@
-using IroningService.Servis.Suclja;
+using IroningService.Repozitorij.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace IroningService.API.Controllers;
 
@@ -7,15 +8,17 @@ namespace IroningService.API.Controllers;
 [Route("api/[controller]")]
 public class UslugeController : ControllerBase
 {
-    private readonly IUslugaServis _servis;
-    public UslugeController(IUslugaServis servis)
+    private readonly RepozitorijContext _context;
+
+    public UslugeController(RepozitorijContext context)
     {
-        _servis = servis;
+        _context = context;
     }
 
     [HttpGet]
-    public async Task<IActionResult> DohvatiSve()
+    public async Task<IActionResult> DohvatiSveUsluge()
     {
-        return Ok(await _servis.DohvatiSveUsluge());
+        var usluge = await _context.Usluge.ToListAsync();
+        return Ok(usluge);
     }
 }

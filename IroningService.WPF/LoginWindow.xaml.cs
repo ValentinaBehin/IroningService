@@ -13,33 +13,35 @@ public partial class LoginWindow : Window
     public LoginWindow() => InitializeComponent();
 
     private async void BtnPrijava_Click(object sender, RoutedEventArgs e)
+{
+    var podaci = new Korisnik { Email = txtEmail.Text, Lozinka = txtLozinka.Password };
+    
+    try 
     {
-        var podaci = new Korisnik { Email = txtEmail.Text, Lozinka = txtLozinka.Password };
+        var response = await _httpClient.PostAsJsonAsync("api/korisnici/prijava", podaci);
         
-        try 
+        if (response.IsSuccessStatusCode)
         {
-            var response = await _httpClient.PostAsJsonAsync("api/korisnici/prijava", podaci);
-            
-            if (response.IsSuccessStatusCode)
-            {
-                // 1. Spremi email u sesiju
-                UserSession.TrenutniEmail = txtEmail.Text;
+            // 1. Spremi email
+            UserSession.TrenutniEmail = txtEmail.Text;
 
-                // 2. Otvori NarudzbeWindow umjesto MainWindow
-                NarudzbeWindow narudzbe = new NarudzbeWindow();
-                narudzbe.Show();
-                this.Close();
-            }
-            else
-            {
-                MessageBox.Show("Pogrešan email ili lozinka!");
-            }
+            // 2. OTVORI NARUDŽBE PROZOR (Vraćamo kako je radilo)
+            NarudzbeWindow narudzbe = new NarudzbeWindow();
+            narudzbe.Show();
+            
+            // 3. Zatvori Login
+            this.Close();
         }
-        catch (Exception ex)
+        else
         {
-            MessageBox.Show($"Greška pri povezivanju s API-jem: {ex.Message}");
+            MessageBox.Show("Pogrešan email ili lozinka!");
         }
     }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"Greška: {ex.Message}");
+    }
+}
 
     private void BtnRegistracija_Click(object sender, RoutedEventArgs e)
     {

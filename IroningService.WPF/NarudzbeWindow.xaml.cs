@@ -17,15 +17,11 @@ public partial class NarudzbeWindow : Window
         this.Loaded += NarudzbeWindow_Loaded;
     }
 
-    // Učitavanje narudžbi samo za prijavljenog korisnika
     private async void NarudzbeWindow_Loaded(object sender, RoutedEventArgs e)
     {
         try
         {
-            // Koristimo email koji smo spremili tijekom prijave (UserSession)
             string email = UserSession.TrenutniEmail; 
-
-            // Pozivamo API s emailom kao parametrom
             var narudzbe = await _httpClient.GetFromJsonAsync<List<Narudzba>>($"api/narudzbe?email={email}");
             dgNarudzbe.ItemsSource = narudzbe;
         }
@@ -37,17 +33,23 @@ public partial class NarudzbeWindow : Window
 
     private void BtnOdjava_Click(object sender, RoutedEventArgs e)
     {
-        // Čistimo sesiju pri odjavi
         UserSession.TrenutniEmail = string.Empty;
-        
         LoginWindow login = new LoginWindow();
         login.Show();
         this.Close();
     }
 
+    // OVDJE JE PROMJENA: Sada otvara tvoj novi prozor za odabir usluga
     private void BtnNovaNarudzba_Click(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show("Ovdje će se otvoriti prozor za novu narudžbu.");
+        OdabirUslugaWindow odabirUsluga = new OdabirUslugaWindow();
+        
+        // Koristimo ShowDialog kako bi se nakon zatvaranja osvježila lista
+        if (odabirUsluga.ShowDialog() == true)
+        {
+            // Osvježavamo listu nakon povratka iz prozora za odabir
+            NarudzbeWindow_Loaded(null, null);
+        }
     }
 
     private async void BtnPonovi_Click(object sender, RoutedEventArgs e)
@@ -62,7 +64,6 @@ public partial class NarudzbeWindow : Window
             if (response.IsSuccessStatusCode)
             {
                 MessageBox.Show("Narudžba uspješno ponovljena!");
-                // Osvježavamo listu nakon ponavljanja
                 NarudzbeWindow_Loaded(null, null); 
             }
             else

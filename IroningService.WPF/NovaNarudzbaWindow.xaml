@@ -1,0 +1,32 @@
+<Window x:Class="IroningService.WPF.NovaNarudzbaWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Nova Narudžba" Height="500" Width="400" WindowStartupLocation="CenterScreen">
+    
+    <StackPanel Margin="20">
+        <TextBlock Text="Odaberite uslugu:" FontWeight="Bold" Margin="0,0,0,5"/>
+        <ComboBox x:Name="cmbUsluge" DisplayMemberPath="Naziv" Margin="0,0,0,15"/>
+
+        <CheckBox Name="chkPrikup" Content="Potreban prikup" 
+                  Checked="ProvjeriAdresu" Unchecked="ProvjeriAdresu" Margin="0,0,0,5"/>
+        <CheckBox Name="chkDostava" Content="Potrebna dostava" 
+                  Checked="ProvjeriAdresu" Unchecked="ProvjeriAdresu" Margin="0,0,0,15"/>
+
+        <StackPanel Name="pnlAdresa" Visibility="Collapsed" Margin="0,0,0,15">
+            <TextBlock Text="Unesite adresu za prikup/dostavu:" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBox Name="txtAdresa" Height="60" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <Button Content="Dodaj u narudžbu" Click="btnDodajStavku_Click" Margin="0,0,0,15"/>
+
+        <DataGrid x:Name="dgStavke" Height="120" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,15">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Usluga" Binding="{Binding Naziv}" Width="*"/>
+                <DataGridTextColumn Header="Cijena" Binding="{Binding Cijena}" Width="Auto"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Button x:Name="btnSpremi" Content="Spremi narudžbu" Click="btnSpremi_Click" 
+                Background="LightGreen" Padding="10" FontWeight="Bold"/>
+    </StackPanel>
+</Window>

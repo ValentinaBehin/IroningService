@@ -13,11 +13,9 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         
-        // Postavljamo klijent na tvoj API port
         _httpClient = new HttpClient();
         _httpClient.BaseAddress = new Uri("http://localhost:5038/");
 
-        // Pokrećemo učitavanje nakon što se prozor učita
         Loaded += MainWindow_Loaded;
     }
 
@@ -26,23 +24,30 @@ public partial class MainWindow : Window
         await UcitajNarudzbe();
     }
 
-    private async Task UcitajNarudzbe()
+    private void btnNovaNarudzba_Click(object sender, RoutedEventArgs e)
     {
-        try
-        {
-            // Pozivamo API endpoint (provjeri je li putanja u kontroleru /api/narudzbe)
-            var narudzbe = await _httpClient.GetFromJsonAsync<List<Narudzba>>("api/narudzbe");
-            
-            // Povezujemo podatke s DataGridom
-            // Koristimo Dispatcher jer dolazimo iz asinkronog poziva
-            Dispatcher.Invoke(() => 
-            {
-                MyDataGrid.ItemsSource = narudzbe;
-            });
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Greška pri dohvaćanju narudžbi: {ex.Message}", "Greška", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+        NovaNarudzbaWindow noviProzor = new NovaNarudzbaWindow();
+        noviProzor.ShowDialog();
+        
+        // Nakon zatvaranja prozora, osvježi listu
+        _ = UcitajNarudzbe();
     }
+
+    private async Task UcitajNarudzbe()
+{
+    // Ako email nije postavljen, nemoj ni pokušavati zvati API
+    if (string.IsNullOrEmpty(UserSession.TrenutniEmail)) return;
+
+    try
+    {
+        string url = $"api/narudzbe?email={UserSession.TrenutniEmail}";
+        var narudzbe = await _httpClient.GetFromJsonAsync<List<Narudzba>>(url);
+        
+        Dispatcher.Invoke(() => { MyDataGrid.ItemsSource = narudzbe; });
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"Greška: {ex.Message}");
+    }
+}
 }

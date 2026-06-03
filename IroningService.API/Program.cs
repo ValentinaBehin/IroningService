@@ -33,7 +33,16 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddControllers();
 
+
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<RepozitorijContext>();
+    // Osiguraj da je baza kreirana
+    context.Database.EnsureCreated(); 
+    // Pokreni punjenje podataka
+    DataSeeder.SeedUsluge(context);
+}
 
 app.UseStaticFiles();
 app.UseAntiforgery();
