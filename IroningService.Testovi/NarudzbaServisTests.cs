@@ -3,7 +3,6 @@ using Moq;
 using IroningService.Servis.Implementacije;
 using IroningService.Repozitorij.Suclja;
 using IroningService.Domena.Entiteti;
-using IroningService.Repozitorij.Data; // Provjeri da li je ovo točan namespace za tvoj RepozitorijContext
 
 namespace IroningService.Testovi;
 
@@ -12,33 +11,66 @@ public class NarudzbaServisTests
     [Fact]
     public async Task IzracunajUkupnuCijenu_TrebaZbrojitiStavke()
     {
-        // 1. ARRANGE (Priprema)
+        // ARRANGE
         var mockUslugaRepo = new Mock<IUslugaRepozitorij>();
         var mockNarudzbaRepo = new Mock<INarudzbaRepozitorij>();
         
-        // Stvaramo mock za kontekst kako bismo izbjegli null upozorenje
-        var mockContext = new Mock<RepozitorijContext>(); 
+        // KORISTIMO KONSTRUKTOR S DVA PARAMETRA (bez contexta)
+        var servis = new NarudzbaServis(mockUslugaRepo.Object, mockNarudzbaRepo.Object);
 
-        // Postavljamo ponašanje mock repozitorija
         mockUslugaRepo.Setup(repo => repo.GetByIdAsync(1))
                       .ReturnsAsync(new UslugaPeglanja { Id = 1, Naziv = "Peglanje", Cijena = 10.00m });
-
-        // Inicijaliziramo servis s .Object (to pretvara Mock u pravi objekt)
-        var servis = new NarudzbaServis(
-            mockUslugaRepo.Object, 
-            mockNarudzbaRepo.Object, 
-            mockContext.Object
-        );
 
         var stavke = new List<StavkaNarudzbe>
         {
             new StavkaNarudzbe { UslugaId = 1, Kolicina = 3 }
         };
 
-        // 2. ACT (Izvršavanje)
+        // ACT
         var ukupno = await servis.IzracunajUkupnuCijenu(stavke);
 
-        // 3. ASSERT (Provjera)
+        // ASSERT
         Assert.Equal(30.00m, ukupno);
+    }
+
+    [Fact]
+    public async Task IzracunajUkupnuCijenu_PraznaLista_TrebaVratitiNulu()
+    {
+        // ARRANGE
+        var mockUslugaRepo = new Mock<IUslugaRepozitorij>();
+        var mockNarudzbaRepo = new Mock<INarudzbaRepozitorij>();
+
+        var servis = new NarudzbaServis(mockUslugaRepo.Object, mockNarudzbaRepo.Object);
+        var prazneStavke = new List<StavkaNarudzbe>();
+
+        // ACT
+        var ukupno = await servis.IzracunajUkupnuCijenu(prazneStavke);
+
+        // ASSERT
+        Assert.Equal(0, ukupno);
+    }
+
+    [Fact]
+    public async Task IzracunajUkupnuCijenu_RazliciteStavke_TrebaZbrojitiTocno()
+    {
+        // ARRANGE
+        var mockUslugaRepo = new Mock<IUslugaRepozitorij>();
+        var mockNarudzbaRepo = new Mock<INarudzbaRepozitorij>();
+
+        mockUslugaRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(new UslugaPeglanja { Id = 1, Cijena = 10.00m });
+        mockUslugaRepo.Setup(r => r.GetByIdAsync(2)).ReturnsAsync(new UslugaPeglanja { Id = 2, Cijena = 5.00m });
+
+        var servis = new NarudzbaServis(mockUslugaRepo.Object, mockNarudzbaRepo.Object);
+        var stavke = new List<StavkaNarudzbe>
+        {
+            new StavkaNarudzbe { UslugaId = 1, Kolicina = 1 }, 
+            new StavkaNarudzbe { UslugaId = 2, Kolicina = 2 }  
+        };
+
+        // ACT
+        var ukupno = await servis.IzracunajUkupnuCijenu(stavke);
+
+        // ASSERT
+        Assert.Equal(20.00m, ukupno);
     }
 }

@@ -10,8 +10,9 @@ public class NarudzbaServis : INarudzbaServis
 {
     private readonly IUslugaRepozitorij _uslugaRepo;
     private readonly INarudzbaRepozitorij _narudzbaRepo;
-    private readonly RepozitorijContext _context;
+    private readonly RepozitorijContext? _context;
 
+    // GLAVNI KONSTRUKTOR (za aplikaciju)
     public NarudzbaServis(IUslugaRepozitorij uslugaRepo, INarudzbaRepozitorij narudzbaRepo, RepozitorijContext context)
     {
         _uslugaRepo = uslugaRepo;
@@ -19,9 +20,18 @@ public class NarudzbaServis : INarudzbaServis
         _context = context;
     }
 
+    // KONSTRUKTOR (za testove - ovdje context može biti null ili mock)
+    public NarudzbaServis(IUslugaRepozitorij uslugaRepo, INarudzbaRepozitorij narudzbaRepo)
+    {
+        _uslugaRepo = uslugaRepo;
+        _narudzbaRepo = narudzbaRepo;
+        _context = null;
+    }
+
     public async Task<IEnumerable<Narudzba>> DohvatiSveNarudzbeAsync()
     {
-        // Ako trebaš i ovdje prikazivati usluge, dodaj .Include i ovdje
+        if (_context == null) throw new InvalidOperationException("Kontekst baze nije inicijaliziran.");
+        
         return await _context.Narudzbe
             .Include(n => n.Stavke)
                 .ThenInclude(s => s.Usluga)
@@ -29,22 +39,23 @@ public class NarudzbaServis : INarudzbaServis
     }
 
     public async Task<List<Narudzba>> DohvatiNarudzbePoEmailuAsync(string email)
-{
-    var narudzbe = await _context.Narudzbe
-        .Include(n => n.Stavke)
-        .Where(n => n.KlijentEmail == email)
-        .ToListAsync();
-
-    // Ručno popunjavanje ako Include ne radi
-    foreach(var n in narudzbe)
     {
-        foreach(var s in n.Stavke)
+        if (_context == null) throw new InvalidOperationException("Kontekst baze nije inicijaliziran.");
+
+        var narudzbe = await _context.Narudzbe
+            .Include(n => n.Stavke)
+            .Where(n => n.KlijentEmail == email)
+            .ToListAsync();
+
+        foreach(var n in narudzbe)
         {
-            s.Usluga = await _context.Usluge.FindAsync(s.UslugaId);
+            foreach(var s in n.Stavke)
+            {
+                s.Usluga = await _context.Usluge.FindAsync(s.UslugaId);
+            }
         }
+        return narudzbe;
     }
-    return narudzbe;
-}
 
     public async Task<decimal> IzracunajUkupnuCijenu(List<StavkaNarudzbe> stavke)
     {
