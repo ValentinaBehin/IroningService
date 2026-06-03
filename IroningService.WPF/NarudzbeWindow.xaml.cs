@@ -85,4 +85,16 @@ public partial class NarudzbeWindow : Window
             }
         }
     }
+    private void BtnPregled_Click(object sender, RoutedEventArgs e)
+{
+    var button = sender as System.Windows.Controls.Button;
+    
+    var narudzba = button?.DataContext as Narudzba;
+
+    if (narudzba != null)
+    {
+        DetaljiNarudzbeWindow detalji = new DetaljiNarudzbeWindow(narudzba);
+        detalji.ShowDialog();
+    }
+}
 }
