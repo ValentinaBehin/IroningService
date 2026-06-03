@@ -15,10 +15,17 @@ public class KorisnikServis : IKorisnikServis
 }
 public async Task RegistrirajKorisnikaAsync(Korisnik korisnik)
 {
-    // Ovdje dodajemo logiku: npr. provjera lozinke
-    if (korisnik.Lozinka.Length < 6)
+    // 1. Logička validacija (provjera baze)
+    var postojeci = await _repo.GetByEmailAsync(korisnik.Email);
+    if (postojeci != null)
     {
-        throw new ArgumentException("Lozinka je prekratka!");
+        throw new InvalidOperationException("Korisnik s ovim emailom već postoji.");
+    }
+
+    // 2. Dodatna pravila
+    if (korisnik.Lozinka.Contains("123456")) 
+    {
+        throw new ArgumentException("Lozinka je prejednostavna.");
     }
 
     await _repo.DodajKorisnikaAsync(korisnik);

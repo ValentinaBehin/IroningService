@@ -8,7 +8,7 @@ using IroningService.Blazor.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. LOGGING (Dolazi s builderom, ali ga možemo dodatno konfigurirati)
+// 1. LOGGING
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
@@ -32,6 +32,13 @@ builder.Services.AddScoped<IUslugaServis, UslugaServis>();
 builder.Services.AddScoped<INarudzbaServis, NarudzbaServis>();
 builder.Services.AddScoped<IKorisnikServis, KorisnikServis>();
 
+// AUTHENTICATION (Sada je ispravno na vrhu!)
+builder.Services.AddAuthentication("Cookies")
+    .AddCookie("Cookies", options => {
+        options.LoginPath = "/Login";
+        options.AccessDeniedPath = "/AccessDenied";
+    });
+
 // Blazor i Kontroleri
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -41,7 +48,6 @@ builder.Services.AddControllers();
 var app = builder.Build();
 
 // 2. ERROR HANDLING MIDDLEWARE
-// U razvojnom okruženju detaljan error page, u produkciji generički
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
@@ -63,6 +69,10 @@ using (var scope = app.Services.CreateScope())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+// 3. MIDDLEWARE ZA AUTH (Nakon Build-a)
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
