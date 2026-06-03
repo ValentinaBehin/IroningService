@@ -3,7 +3,6 @@ using IroningService.Domena.Entiteti;
 using IroningService.Servis.Suclja;
 
 namespace IroningService.API.Controllers;
-
 [ApiController]
 [Route("api/[controller]")]
 public class NarudzbeController : ControllerBase
@@ -15,45 +14,38 @@ public class NarudzbeController : ControllerBase
         _narudzbaServis = narudzbaServis;
     }
 
-    // GET: api/narudzbe?email=korisnik@example.com
-    // Sada filtriramo narudžbe prema emailu
+    // GET: api/narudzbe?email=...
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Narudzba>>> GetPoEmailu([FromQuery] string email)
     {
-        if (string.IsNullOrEmpty(email))
-        {
-            return BadRequest("Email je obavezan za dohvat narudžbi.");
-        }
+        if (string.IsNullOrEmpty(email)) return BadRequest("Email je obavezan.");
 
         try
         {
-            // Ovdje koristimo servis da filtriramo narudžbe
+            // Ovdje servis MORA dohvatiti narudžbe zajedno sa stavkama i uslugama
             var narudzbe = await _narudzbaServis.DohvatiNarudzbePoEmailuAsync(email);
             return Ok(narudzbe);
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Pogreška na serveru: {ex.Message}");
+            return StatusCode(500, ex.Message);
         }
     }
 
-    // POST: api/narudzbe
     [HttpPost]
     public async Task<IActionResult> Kreiraj([FromBody] Narudzba narudzba)
     {
-        if (narudzba == null)
-        {
-            return BadRequest("Narudžba ne smije biti prazna.");
-        }
+        if (narudzba == null) return BadRequest("Narudžba ne smije biti prazna.");
 
         try
         {
+            // Ovdje servis sprema narudžbu
             await _narudzbaServis.KreirajNarudzbu(narudzba);
-            return Ok(new { poruka = "Narudžba je uspješno zaprimljena!" });
+            return Ok(new { poruka = "Uspješno!" });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Pogreška pri spremanju: {ex.Message}");
+            return StatusCode(500, ex.Message);
         }
     }
 }

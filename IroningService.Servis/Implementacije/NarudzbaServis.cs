@@ -1,7 +1,7 @@
 using IroningService.Domena.Entiteti;
 using IroningService.Repozitorij.Suclja;
 using IroningService.Servis.Suclja;
-using IroningService.Repozitorij.Data; // Ovdje se nalazi RepozitorijContext
+using IroningService.Repozitorij.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace IroningService.Servis.Implementacije;
@@ -10,7 +10,7 @@ public class NarudzbaServis : INarudzbaServis
 {
     private readonly IUslugaRepozitorij _uslugaRepo;
     private readonly INarudzbaRepozitorij _narudzbaRepo;
-    private readonly RepozitorijContext _context; // Ispravljeno ime klase
+    private readonly RepozitorijContext _context;
 
     public NarudzbaServis(IUslugaRepozitorij uslugaRepo, INarudzbaRepozitorij narudzbaRepo, RepozitorijContext context)
     {
@@ -21,13 +21,18 @@ public class NarudzbaServis : INarudzbaServis
 
     public async Task<IEnumerable<Narudzba>> DohvatiSveNarudzbeAsync()
     {
-        return await _narudzbaRepo.GetAllAsync();
+        // Ako trebaš i ovdje prikazivati usluge, dodaj .Include i ovdje
+        return await _context.Narudzbe
+            .Include(n => n.Stavke)
+                .ThenInclude(s => s.Usluga)
+            .ToListAsync();
     }
 
     public async Task<List<Narudzba>> DohvatiNarudzbePoEmailuAsync(string email)
     {
         return await _context.Narudzbe
-            .Include(n => n.Stavke)
+            .Include(n => n.Stavke)            // Učitava listu stavki
+                .ThenInclude(s => s.Usluga)    // Učitava naziv usluge za svaku stavku
             .Where(n => n.KlijentEmail == email)
             .OrderByDescending(n => n.DatumNarudzbe)
             .ToListAsync();

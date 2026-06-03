@@ -27,17 +27,17 @@ public partial class OdabirUslugaWindow : Window
     }
 
     private void ProvjeriAdresu(object sender, RoutedEventArgs e)
+{
+     if (chkPrikup.IsChecked == true || chkDostava.IsChecked == true)
     {
-        if (chkPrikup.IsChecked == true || chkDostava.IsChecked == true)
-        {
-            pnlAdresa.Visibility = Visibility.Visible;
-        }
-        else
-        {
-            pnlAdresa.Visibility = Visibility.Collapsed;
-            txtAdresa.Text = string.Empty;
-        }
+        pnlAdresa.Visibility = Visibility.Visible;
     }
+    else
+    {
+        pnlAdresa.Visibility = Visibility.Collapsed;
+        txtAdresa.Text = string.Empty; // Očisti unos ako nije potrebno
+    }
+}
 
     private async void UcitajUsluge()
     {
@@ -143,7 +143,7 @@ public partial class OdabirUslugaWindow : Window
             }
         }
 
-        txtUkupnaCijena.Text = ukupno.ToString("C");
+        txtUkupnaCijena.Text = ukupno.ToString("F2") + " €";
     }
 
     private T? FindVisualChild<T>(DependencyObject obj) where T : DependencyObject

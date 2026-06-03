@@ -19,6 +19,12 @@ public partial class NarudzbeWindow : Window
 
     private async void NarudzbeWindow_Loaded(object sender, RoutedEventArgs e)
     {
+        await UcitajNarudzbe();
+    }
+
+    // Odvojena metoda za učitavanje - pozivamo je kad god želimo osvježiti listu
+    private async System.Threading.Tasks.Task UcitajNarudzbe()
+    {
         try
         {
             string email = UserSession.TrenutniEmail; 
@@ -39,16 +45,14 @@ public partial class NarudzbeWindow : Window
         this.Close();
     }
 
-    // OVDJE JE PROMJENA: Sada otvara tvoj novi prozor za odabir usluga
-    private void BtnNovaNarudzba_Click(object sender, RoutedEventArgs e)
+    // Sada uredno osvježava listu nakon potvrde
+    private async void BtnNovaNarudzba_Click(object sender, RoutedEventArgs e)
     {
         OdabirUslugaWindow odabirUsluga = new OdabirUslugaWindow();
         
-        // Koristimo ShowDialog kako bi se nakon zatvaranja osvježila lista
         if (odabirUsluga.ShowDialog() == true)
         {
-            // Osvježavamo listu nakon povratka iz prozora za odabir
-            NarudzbeWindow_Loaded(null, null);
+            await UcitajNarudzbe(); // Sigurno osvježavanje
         }
     }
 
@@ -64,7 +68,7 @@ public partial class NarudzbeWindow : Window
             if (response.IsSuccessStatusCode)
             {
                 MessageBox.Show("Narudžba uspješno ponovljena!");
-                NarudzbeWindow_Loaded(null, null); 
+                await UcitajNarudzbe(); // Osvježi nakon ponavljanja
             }
             else
             {

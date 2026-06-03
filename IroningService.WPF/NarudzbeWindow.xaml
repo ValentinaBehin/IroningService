@@ -9,7 +9,28 @@
             <Button Content="Odjava" Click="BtnOdjava_Click" DockPanel.Dock="Right" Padding="10,5" />
         </DockPanel>
 
-        <DataGrid x:Name="dgNarudzbe" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True">
-             </DataGrid>
+        <DataGrid x:Name="dgNarudzbe" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Height="350">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Datum" Binding="{Binding DatumNarudzbe, StringFormat='dd.MM.yyyy HH:mm'}" Width="120"/>
+                <DataGridTextColumn Header="Adresa" Binding="{Binding Adresa}" Width="200"/>
+                <DataGridCheckBoxColumn Header="Dostava" Binding="{Binding PotrebnaDostava}" Width="60"/>
+                
+                <DataGridTemplateColumn Header="Usluge (Naziv: Količina)" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ItemsControl ItemsSource="{Binding Stavke}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Usluga.Naziv, StringFormat='{}{0}: {1} kom.'}" Margin="2,0"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Header="Ukupno" Binding="{Binding UkupnaCijena, StringFormat='{}{0:F2} €'}" Width="80"/>
+            </DataGrid.Columns>
+        </DataGrid>
     </StackPanel>
 </Window>
