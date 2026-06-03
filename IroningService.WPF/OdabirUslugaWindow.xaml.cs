@@ -95,9 +95,9 @@ public partial class OdabirUslugaWindow : Window
             KlijentEmail = UserSession.TrenutniEmail,
             DatumNarudzbe = DateTime.Now,
             TerminDostave = DateTime.Now.AddDays(2),
-            Adresa = pnlAdresa.Visibility == Visibility.Visible ? txtAdresa.Text : "N/A",
-            PotrebnaDostava = chkDostava.IsChecked ?? false,
-            Stavke = odabraneStavke
+            Adresa = (pnlAdresa.Visibility == Visibility.Visible) ? txtAdresa.Text : "N/A",
+    PotrebnaDostava = chkDostava.IsChecked ?? false,
+    Stavke = odabraneStavke
         };
 
         try

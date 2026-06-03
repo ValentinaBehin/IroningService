@@ -29,14 +29,22 @@ public class NarudzbaServis : INarudzbaServis
     }
 
     public async Task<List<Narudzba>> DohvatiNarudzbePoEmailuAsync(string email)
+{
+    var narudzbe = await _context.Narudzbe
+        .Include(n => n.Stavke)
+        .Where(n => n.KlijentEmail == email)
+        .ToListAsync();
+
+    // Ručno popunjavanje ako Include ne radi
+    foreach(var n in narudzbe)
     {
-        return await _context.Narudzbe
-            .Include(n => n.Stavke)            // Učitava listu stavki
-                .ThenInclude(s => s.Usluga)    // Učitava naziv usluge za svaku stavku
-            .Where(n => n.KlijentEmail == email)
-            .OrderByDescending(n => n.DatumNarudzbe)
-            .ToListAsync();
+        foreach(var s in n.Stavke)
+        {
+            s.Usluga = await _context.Usluge.FindAsync(s.UslugaId);
+        }
     }
+    return narudzbe;
+}
 
     public async Task<decimal> IzracunajUkupnuCijenu(List<StavkaNarudzbe> stavke)
     {

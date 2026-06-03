@@ -2,31 +2,33 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Odabir Usluga" Height="600" Width="400">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </Window.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="20">
             <TextBlock Text="Molim vas odaberite vrstu dostave:" FontWeight="Bold" Margin="0,0,0,5"/>
             
-            <CheckBox Name="chkPrikup" Content="Prikup u Pegleraj" 
-          Checked="ProvjeriAdresu" Unchecked="ProvjeriAdresu" />
-<CheckBox Name="chkDostava" Content="Potrebna dostava" 
-          Checked="ProvjeriAdresu" Unchecked="ProvjeriAdresu" />
+            <CheckBox Name="chkPrikup" Content="Prikup u Pegleraj" />
+            <CheckBox Name="chkDostava" Content="Potrebna dostava" />
 
-<StackPanel Name="pnlAdresa" Visibility="Collapsed">
-    <TextBlock Text="Unesite adresu:" />
-    <TextBox Name="txtAdresa" />
-</StackPanel>
+            <StackPanel Name="pnlAdresa" Margin="0,10,0,10"
+                        Visibility="{Binding ElementName=chkDostava, Path=IsChecked, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="Unesite adresu:" />
+                <TextBox Name="txtAdresa" />
+            </StackPanel>
 
-            <TextBlock Text="Odaberite usluge:" FontWeight="Bold" Margin="0,0,0,10"/>
+            <TextBlock Text="Odaberite usluge:" FontWeight="Bold" Margin="0,10,0,10"/>
             
             <ItemsControl Name="icUsluge">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Margin="5">
-                            <CheckBox Name="chkUsluga" Content="{Binding Naziv}" Width="200" VerticalAlignment="Center"
-                                      Checked="Izracunaj_Event" Unchecked="Izracunaj_Event"/>
+                            <CheckBox Name="chkUsluga" Content="{Binding Naziv}" Width="200" 
+                                      VerticalAlignment="Center" Checked="Izracunaj_Event" Unchecked="Izracunaj_Event"/>
                             
-                            <TextBlock Text="{Binding Cijena, StringFormat='{}{0:C}'}" 
+                            <TextBlock Text="{Binding Cijena, StringFormat='{}{0:F2} €'}" 
                                        FontWeight="Bold" Foreground="DarkGreen" Width="60" VerticalAlignment="Center"/>
 
                             <StackPanel Name="pnlKolicina" Orientation="Horizontal" Visibility="Collapsed">
@@ -35,7 +37,6 @@
                                          TextChanged="Izracunaj_Event"/>
                             </StackPanel>
                         </StackPanel>
-
                         <DataTemplate.Triggers>
                             <DataTrigger Binding="{Binding ElementName=chkUsluga, Path=IsChecked}" Value="True">
                                 <Setter TargetName="pnlKolicina" Property="Visibility" Value="Visible"/>

@@ -22,13 +22,23 @@ public partial class NarudzbeWindow : Window
         await UcitajNarudzbe();
     }
 
-    // Odvojena metoda za učitavanje - pozivamo je kad god želimo osvježiti listu
     private async System.Threading.Tasks.Task UcitajNarudzbe()
     {
         try
         {
             string email = UserSession.TrenutniEmail; 
             var narudzbe = await _httpClient.GetFromJsonAsync<List<Narudzba>>($"api/narudzbe?email={email}");
+
+            // --- DEBUG PROVJERA ---
+            if (narudzbe != null && narudzbe.Count > 0)
+            {
+                // Ako ovo prikaže praznu poruku, problem je u API-ju ili bazi (Adresa ne dolazi)
+                // Ako prikaže adresu, problem je u DataGrid bindingu
+                var prvaNarudzba = narudzbe[0];
+                System.Diagnostics.Debug.WriteLine($"Debug: Prva narudžba ima adresu: '{narudzbe[0].Adresa}'");
+            }
+            // ----------------------
+
             dgNarudzbe.ItemsSource = narudzbe;
         }
         catch (Exception ex)
@@ -45,14 +55,13 @@ public partial class NarudzbeWindow : Window
         this.Close();
     }
 
-    // Sada uredno osvježava listu nakon potvrde
     private async void BtnNovaNarudzba_Click(object sender, RoutedEventArgs e)
     {
         OdabirUslugaWindow odabirUsluga = new OdabirUslugaWindow();
         
         if (odabirUsluga.ShowDialog() == true)
         {
-            await UcitajNarudzbe(); // Sigurno osvježavanje
+            await UcitajNarudzbe();
         }
     }
 
@@ -68,7 +77,7 @@ public partial class NarudzbeWindow : Window
             if (response.IsSuccessStatusCode)
             {
                 MessageBox.Show("Narudžba uspješno ponovljena!");
-                await UcitajNarudzbe(); // Osvježi nakon ponavljanja
+                await UcitajNarudzbe();
             }
             else
             {

@@ -33,6 +33,22 @@ public partial class NovaNarudzbaWindow : Window
             MessageBox.Show($"Greška pri učitavanju usluga: {ex.Message}");
         }
     }
+    
+private void ProvjeriAdresu(object sender, RoutedEventArgs e)
+{
+    // Provjera da li su kontrole inicijalizirane prije pristupa
+    if (pnlAdresa == null) return;
+
+    if (chkPrikup?.IsChecked == true || chkDostava?.IsChecked == true)
+    {
+        pnlAdresa.Visibility = Visibility.Visible;
+    }
+    else
+    {
+        pnlAdresa.Visibility = Visibility.Collapsed;
+        txtAdresa.Text = string.Empty;
+    }
+}
 
     private void btnDodajStavku_Click(object sender, RoutedEventArgs e)
     {
@@ -47,18 +63,7 @@ public partial class NovaNarudzbaWindow : Window
         }
     }
 
-    private void ProvjeriAdresu(object sender, RoutedEventArgs e)
-    {
-        if (chkPrikup.IsChecked == true || chkDostava.IsChecked == true)
-        {
-            pnlAdresa.Visibility = Visibility.Visible;
-        }
-        else
-        {
-            pnlAdresa.Visibility = Visibility.Collapsed;
-            txtAdresa.Text = string.Empty;
-        }
-    }
+    
 
     private async void btnSpremi_Click(object sender, RoutedEventArgs e)
     {

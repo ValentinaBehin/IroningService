@@ -15,19 +15,26 @@
                 <DataGridTextColumn Header="Adresa" Binding="{Binding Adresa}" Width="200"/>
                 <DataGridCheckBoxColumn Header="Dostava" Binding="{Binding PotrebnaDostava}" Width="60"/>
                 
-                <DataGridTemplateColumn Header="Usluge (Naziv: Količina)" Width="*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <ItemsControl ItemsSource="{Binding Stavke}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Usluga.Naziv, StringFormat='{}{0}: {1} kom.'}" Margin="2,0"/>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Usluge" Width="*">
+    <DataGridTemplateColumn.CellTemplate>
+        <DataTemplate>
+            <ListBox ItemsSource="{Binding Stavke}" BorderThickness="0" Background="Transparent">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Foreground="Black" FontWeight="Bold" Margin="2,0">
+    <TextBlock.Text>
+        <MultiBinding StringFormat="{}{0}: {1} kom.">
+            <Binding Path="Usluga.Naziv" />
+            <Binding Path="Kolicina" />
+        </MultiBinding>
+    </TextBlock.Text>
+</TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DataTemplate>
+    </DataGridTemplateColumn.CellTemplate>
+</DataGridTemplateColumn>
 
                 <DataGridTextColumn Header="Ukupno" Binding="{Binding UkupnaCijena, StringFormat='{}{0:F2} €'}" Width="80"/>
             </DataGrid.Columns>
