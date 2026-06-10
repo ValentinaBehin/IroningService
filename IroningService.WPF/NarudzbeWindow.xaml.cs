@@ -72,7 +72,7 @@ public partial class NarudzbeWindow : Window
 
         if (narudzba != null)
         {
-            var response = await _httpClient.PostAsJsonAsync("api/narudzbe/ponovi", narudzba.Id);
+            var response = await _httpClient.PostAsJsonAsync("api/narudzbe/ponovi", narudzba.NarudzbaId);
             
             if (response.IsSuccessStatusCode)
             {

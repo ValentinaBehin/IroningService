@@ -4,6 +4,7 @@ namespace IroningService.Domena.Entiteti;
 
 public class Korisnik
 {
+    [Key]
     public int Id { get; set; }
 
     [Required(ErrorMessage = "Ime je obavezno.")]

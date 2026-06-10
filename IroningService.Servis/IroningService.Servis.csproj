@@ -1,14 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <ItemGroup>
-    <ProjectReference Include="..\IroningService.Repozitorij\IroningService.Repozitorij.csproj" />
-    <ProjectReference Include="..\IroningService.Domena\IroningService.Domena.csproj" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\IroningService.Domena\IroningService.Domena.csproj" />
+    <ProjectReference Include="..\IroningService.Repozitorij\IroningService.Repozitorij.csproj" />
+  </ItemGroup>
 </Project>

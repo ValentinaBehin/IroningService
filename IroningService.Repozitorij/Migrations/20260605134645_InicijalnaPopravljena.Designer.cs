@@ -4,6 +4,7 @@ using IroningService.Repozitorij.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IroningService.Repozitorij.Migrations
 {
     [DbContext(typeof(RepozitorijContext))]
-    partial class RepozitorijContextModelSnapshot : ModelSnapshot
+    [Migration("20260605134645_InicijalnaPopravljena")]
+    partial class InicijalnaPopravljena
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,12 +79,6 @@ namespace IroningService.Repozitorij.Migrations
 
                     b.Property<bool>("PotrebnaDostava")
                         .HasColumnType("bit");
-
-                    b.Property<string>("RecenzijaKomentar")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("RecenzijaOcjena")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("TerminDostave")
                         .HasColumnType("datetime2");

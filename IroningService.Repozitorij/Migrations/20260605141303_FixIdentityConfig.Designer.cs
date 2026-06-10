@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IroningService.Repozitorij.Migrations
 {
     [DbContext(typeof(RepozitorijContext))]
-    [Migration("20260602121133_DodajKorisnika")]
-    partial class DodajKorisnika
+    [Migration("20260605141303_FixIdentityConfig")]
+    partial class FixIdentityConfig
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,7 +39,8 @@ namespace IroningService.Repozitorij.Migrations
 
                     b.Property<string>("Ime")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Lozinka")
                         .IsRequired()
@@ -47,7 +48,8 @@ namespace IroningService.Repozitorij.Migrations
 
                     b.Property<string>("Prezime")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -56,14 +58,13 @@ namespace IroningService.Repozitorij.Migrations
 
             modelBuilder.Entity("IroningService.Domena.Entiteti.Narudzba", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("NarudzbaId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NarudzbaId"));
 
                     b.Property<string>("Adresa")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DatumNarudzbe")
@@ -72,6 +73,9 @@ namespace IroningService.Repozitorij.Migrations
                     b.Property<string>("KlijentEmail")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("KorisnikId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("PotrebnaDostava")
                         .HasColumnType("bit");
@@ -83,7 +87,7 @@ namespace IroningService.Repozitorij.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("Id");
+                    b.HasKey("NarudzbaId");
 
                     b.ToTable("Narudzbe");
                 });
@@ -113,6 +117,8 @@ namespace IroningService.Repozitorij.Migrations
 
                     b.HasIndex("NarudzbaId");
 
+                    b.HasIndex("UslugaId");
+
                     b.ToTable("StavkeNarudzbe");
                 });
 
@@ -140,6 +146,32 @@ namespace IroningService.Repozitorij.Migrations
                     b.ToTable("Usluge");
                 });
 
+            modelBuilder.Entity("Recenzija", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DatumRecenzije")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Komentar")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NarudzbaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Ocjena")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Recenzije");
+                });
+
             modelBuilder.Entity("IroningService.Domena.Entiteti.StavkaNarudzbe", b =>
                 {
                     b.HasOne("IroningService.Domena.Entiteti.Narudzba", "Narudzba")
@@ -148,7 +180,15 @@ namespace IroningService.Repozitorij.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("IroningService.Domena.Entiteti.UslugaPeglanja", "Usluga")
+                        .WithMany()
+                        .HasForeignKey("UslugaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Narudzba");
+
+                    b.Navigation("Usluga");
                 });
 
             modelBuilder.Entity("IroningService.Domena.Entiteti.Narudzba", b =>

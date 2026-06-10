@@ -13,39 +13,46 @@ public partial class LoginWindow : Window
     public LoginWindow() => InitializeComponent();
 
     private async void BtnPrijava_Click(object sender, RoutedEventArgs e)
-{
-    var podaci = new Korisnik { Email = txtEmail.Text, Lozinka = txtLozinka.Password };
-    
-    try 
     {
-        var response = await _httpClient.PostAsJsonAsync("api/korisnici/prijava", podaci);
-        
-        if (response.IsSuccessStatusCode)
+        if (string.IsNullOrWhiteSpace(txtEmail.Text) || string.IsNullOrWhiteSpace(txtLozinka.Password))
         {
-            // 1. Spremi email
-            UserSession.TrenutniEmail = txtEmail.Text;
+            MessageBox.Show("Molimo unesite email i lozinku.");
+            return;
+        }
 
-            // 2. OTVORI NARUDŽBE PROZOR (Vraćamo kako je radilo)
-            NarudzbeWindow narudzbe = new NarudzbeWindow();
-            narudzbe.Show();
-            
-            // 3. Zatvori Login
-            this.Close();
-        }
-        else
+        var podaci = new { Email = txtEmail.Text.Trim(), Lozinka = txtLozinka.Password.Trim() };
+        
+        try 
         {
-            MessageBox.Show("Pogrešan email ili lozinka!");
+            var response = await _httpClient.PostAsJsonAsync("api/korisnici/prijava", podaci);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                UserSession.TrenutniEmail = txtEmail.Text.Trim();
+                
+                // 1. Otvori glavni prozor
+                NarudzbeWindow narudzbe = new NarudzbeWindow();
+                narudzbe.Show();
+                
+                // 2. Samo sakrij Login prozor umjesto da ga zatvoriš
+                this.Hide(); 
+            }
+            else
+            {
+                string poruka = await response.Content.ReadAsStringAsync();
+                MessageBox.Show($"Greška: {poruka}");
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Greška pri povezivanju: {ex.Message}");
         }
     }
-    catch (Exception ex)
-    {
-        MessageBox.Show($"Greška: {ex.Message}");
-    }
-}
 
     private void BtnRegistracija_Click(object sender, RoutedEventArgs e)
     {
         RegistracijaWindow reg = new RegistracijaWindow();
         reg.Show();
     }
+
 }

@@ -41,7 +41,7 @@ public class KorisnikServisTests
     {
         // ARRANGE
         _mockKorisnikRepo.Setup(r => r.GetByEmailAsync(It.IsAny<string>()))
-                         .ReturnsAsync((Korisnik)null);
+                         .ReturnsAsync((Korisnik)null!);
 
         // ACT
         var rezultat = await _servis.DohvatiKorisnikaAsync("nepostojeci@email.hr");

@@ -4,6 +4,7 @@ using IroningService.Repozitorij.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IroningService.Repozitorij.Migrations
 {
     [DbContext(typeof(RepozitorijContext))]
-    partial class RepozitorijContextModelSnapshot : ModelSnapshot
+    [Migration("20260610123820_DodajPoljaZaRecenziju")]
+    partial class DodajPoljaZaRecenziju
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

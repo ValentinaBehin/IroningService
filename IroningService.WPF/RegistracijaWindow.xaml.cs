@@ -1,4 +1,4 @@
-using System; // Dodano zbog Uri
+using System;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Windows;
@@ -8,12 +8,14 @@ namespace IroningService.WPF;
 
 public partial class RegistracijaWindow : Window
 {
+    // Kreiramo HttpClient instancu
     private readonly HttpClient _httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:5038/") };
 
     public RegistracijaWindow() => InitializeComponent();
 
     private async void BtnRegistriraj_Click(object sender, RoutedEventArgs e)
     {
+        // Priprema podataka iz forme
         var noviKorisnik = new Korisnik
         {
             Ime = txtIme.Text,
@@ -24,22 +26,25 @@ public partial class RegistracijaWindow : Window
 
         try 
         {
-            var response = await _httpClient.PostAsJsonAsync("api/korisnici/registracija", noviKorisnik);
+            // Slanje zahtjeva na API (samo jedan poziv!)
+            var response = await _httpClient.PostAsJsonAsync("api/korisnici/registriraj", noviKorisnik);
+
+            // Čitamo cijeli odgovor kao tekst
+            string jsonString = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
             {
-                MessageBox.Show("Uspješno ste se registrirali! Sada se možete prijaviti.");
-                // Ovo zatvara prozor registracije i vraća te na LoginWindow
-                this.Close();
+                MessageBox.Show("Uspjeh!");
             }
             else
             {
-                var error = await response.Content.ReadAsStringAsync();
-                MessageBox.Show($"Greška pri registraciji: {error}");
+                // Ovdje ćemo vidjeti točnu poruku iz API-ja (npr. "Email već postoji")
+                MessageBox.Show("Greška: " + jsonString);
             }
         }
         catch (Exception ex)
         {
+            // Hvatanje grešaka poput "Server nije dostupan"
             MessageBox.Show($"Nije moguće povezati se s API-jem: {ex.Message}");
         }
     }

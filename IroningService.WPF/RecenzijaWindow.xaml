@@ -1,0 +1,17 @@
+<Window x:Class="IroningService.WPF.RecenzijaWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Dodaj recenziju" Height="250" Width="300">
+    
+    <StackPanel Margin="10">
+    <Label Content="Ocjena (1-5):"/>
+    <TextBox x:Name="txtOcjena" /> 
+    
+    <Label Content="Komentar:"/>
+    <TextBox x:Name="txtKomentar" Height="60" TextWrapping="Wrap"/>
+    <Button Name="btnSpremi" Content="Spremi recenziju" Click="BtnSpremi_Click" />
+</StackPanel>
+</Window>

@@ -1,16 +1,25 @@
-﻿using System.Windows;
+﻿using System;
+using System.Globalization;
+using System.Threading;
+using System.Windows;
 
 namespace IroningService.WPF;
 
 public partial class App : Application
 {
-    protected override void OnStartup(StartupEventArgs e)
-{
-    // Postavlja kulturu na hrvatsku, koja koristi Euro
-    var culture = new System.Globalization.CultureInfo("hr-HR");
-    System.Threading.Thread.CurrentThread.CurrentCulture = culture;
-    System.Threading.Thread.CurrentThread.CurrentUICulture = culture;
+    public App()
+    {
+        // 1. Sprječava da se aplikacija ugasi čim se LoginWindow zatvori
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
+    }
 
-    base.OnStartup(e);
-}
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        // 2. Postavlja kulturu na hrvatsku
+        var culture = new CultureInfo("hr-HR");
+        Thread.CurrentThread.CurrentCulture = culture;
+        Thread.CurrentThread.CurrentUICulture = culture;
+
+        base.OnStartup(e);
+    }
 }

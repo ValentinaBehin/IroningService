@@ -1,6 +1,10 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Windows;
+using System.Windows.Controls;
+using System.Threading.Tasks;
 using IroningService.Domena.Entiteti;
 
 namespace IroningService.WPF;
@@ -21,33 +25,48 @@ public partial class MainWindow : Window
 
     private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        await UcitajNarudzbe();
+        await UcitajMojeNarudzbe(); 
     }
 
-    private void btnNovaNarudzba_Click(object sender, RoutedEventArgs e)
+    private async void btnNovaNarudzba_Click(object sender, RoutedEventArgs e)
     {
-        NovaNarudzbaWindow noviProzor = new NovaNarudzbaWindow();
-        noviProzor.ShowDialog();
-        
-        // Nakon zatvaranja prozora, osvježi listu
-        _ = UcitajNarudzbe();
+        var prozor = new OdabirUslugaWindow();
+    
+        // ShowDialog zaustavlja izvršavanje koda dok se prozor ne zatvori
+        if (prozor.ShowDialog() == true) 
+        {
+            await UcitajMojeNarudzbe(); 
+        }
     }
 
-    private async Task UcitajNarudzbe()
-{
-    // Ako email nije postavljen, nemoj ni pokušavati zvati API
-    if (string.IsNullOrEmpty(UserSession.TrenutniEmail)) return;
+    private async Task UcitajMojeNarudzbe()
+    {
+        try
+        {
+            string url = $"api/narudzbe?email={UserSession.TrenutniEmail}";
+            var narudzbe = await _httpClient.GetFromJsonAsync<List<Narudzba>>(url);
+            
+            if (narudzbe != null)
+            {
+                MyDataGrid.ItemsSource = narudzbe;
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Greška pri dohvaćanju narudžbi: " + ex.Message);
+        }
+    }
 
-    try
+    private async void BtnPregled_Click(object sender, RoutedEventArgs e)
     {
-        string url = $"api/narudzbe?email={UserSession.TrenutniEmail}";
-        var narudzbe = await _httpClient.GetFromJsonAsync<List<Narudzba>>(url);
-        
-        Dispatcher.Invoke(() => { MyDataGrid.ItemsSource = narudzbe; });
+        var narudzba = (sender as Button)?.DataContext as Narudzba;
+        if (narudzba != null) 
+        {
+            var prozor = new DetaljiNarudzbeWindow(narudzba);
+            
+            // Kada se DetaljiNarudzbeWindow zatvori, osvježi listu u slučaju da je dodana recenzija
+            prozor.ShowDialog();
+            await UcitajMojeNarudzbe(); 
+        }
     }
-    catch (Exception ex)
-    {
-        MessageBox.Show($"Greška: {ex.Message}");
-    }
-}
 }

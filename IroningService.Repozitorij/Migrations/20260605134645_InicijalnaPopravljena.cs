@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace IroningService.Repozitorij.Migrations
 {
     /// <inheritdoc />
-    public partial class DodajKorisnika : Migration
+    public partial class InicijalnaPopravljena : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,8 +17,8 @@ namespace IroningService.Repozitorij.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Ime = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Prezime = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Ime = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Prezime = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Lozinka = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -31,18 +31,35 @@ namespace IroningService.Repozitorij.Migrations
                 name: "Narudzbe",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    NarudzbaId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    KorisnikId = table.Column<int>(type: "int", nullable: false),
                     KlijentEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DatumNarudzbe = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TerminDostave = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Adresa = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Adresa = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PotrebnaDostava = table.Column<bool>(type: "bit", nullable: false),
                     UkupnaCijena = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Narudzbe", x => x.Id);
+                    table.PrimaryKey("PK_Narudzbe", x => x.NarudzbaId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Recenzije",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NarudzbaId = table.Column<int>(type: "int", nullable: false),
+                    Ocjena = table.Column<int>(type: "int", nullable: false),
+                    Komentar = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DatumRecenzije = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Recenzije", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -78,6 +95,12 @@ namespace IroningService.Repozitorij.Migrations
                         name: "FK_StavkeNarudzbe_Narudzbe_NarudzbaId",
                         column: x => x.NarudzbaId,
                         principalTable: "Narudzbe",
+                        principalColumn: "NarudzbaId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StavkeNarudzbe_Usluge_UslugaId",
+                        column: x => x.UslugaId,
+                        principalTable: "Usluge",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -86,6 +109,11 @@ namespace IroningService.Repozitorij.Migrations
                 name: "IX_StavkeNarudzbe_NarudzbaId",
                 table: "StavkeNarudzbe",
                 column: "NarudzbaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StavkeNarudzbe_UslugaId",
+                table: "StavkeNarudzbe",
+                column: "UslugaId");
         }
 
         /// <inheritdoc />
@@ -95,13 +123,16 @@ namespace IroningService.Repozitorij.Migrations
                 name: "Korisnici");
 
             migrationBuilder.DropTable(
+                name: "Recenzije");
+
+            migrationBuilder.DropTable(
                 name: "StavkeNarudzbe");
 
             migrationBuilder.DropTable(
-                name: "Usluge");
+                name: "Narudzbe");
 
             migrationBuilder.DropTable(
-                name: "Narudzbe");
+                name: "Usluge");
         }
     }
 }

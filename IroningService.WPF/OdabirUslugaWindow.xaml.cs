@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Threading.Tasks; // Dodano za Task
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -17,34 +17,20 @@ public partial class OdabirUslugaWindow : Window
     public OdabirUslugaWindow()
     {
         InitializeComponent();
-        UcitajUsluge();
+        this.Loaded += OdabirUslugaWindow_Loaded;
     }
 
-    // Poziva se na promjenu CheckBox-a ili TextBox-a (iz XAML-a preko Izracunaj_Event)
-    private void Izracunaj_Event(object sender, RoutedEventArgs e)
+    private async void OdabirUslugaWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        IzracunajUkupno();
+        await UcitajUsluge();
     }
 
-    private void ProvjeriAdresu(object sender, RoutedEventArgs e)
-{
-     if (chkPrikup.IsChecked == true || chkDostava.IsChecked == true)
-    {
-        pnlAdresa.Visibility = Visibility.Visible;
-    }
-    else
-    {
-        pnlAdresa.Visibility = Visibility.Collapsed;
-        txtAdresa.Text = string.Empty; // Očisti unos ako nije potrebno
-    }
-}
-
-    private async void UcitajUsluge()
+    private async Task UcitajUsluge()
     {
         try
         {
             var usluge = await _httpClient.GetFromJsonAsync<List<UslugaPeglanja>>("api/usluge");
-            icUsluge.ItemsSource = usluge;
+            if (usluge != null) icUsluge.ItemsSource = usluge;
         }
         catch (Exception ex)
         {
@@ -54,8 +40,8 @@ public partial class OdabirUslugaWindow : Window
 
     private async void BtnSpremi_Click(object sender, RoutedEventArgs e)
     {
+        // 1. Pripremi stavke
         var odabraneStavke = new List<StavkaNarudzbe>();
-
         foreach (var item in icUsluge.Items)
         {
             var container = icUsluge.ItemContainerGenerator.ContainerFromItem(item) as FrameworkElement;
@@ -64,85 +50,69 @@ public partial class OdabirUslugaWindow : Window
             var checkBox = FindVisualChild<CheckBox>(container);
             var textBox = FindVisualChild<TextBox>(container);
 
-            if (checkBox != null && checkBox.IsChecked == true)
+            if (checkBox?.IsChecked == true)
             {
                 var usluga = item as UslugaPeglanja;
-                int kolicina = 1;
-
-                if (textBox != null && int.TryParse(textBox.Text, out int parsedKolicina))
-                    kolicina = parsedKolicina;
-
-                if (usluga != null)
-                {
-                    odabraneStavke.Add(new StavkaNarudzbe
-                    {
-                        UslugaId = usluga.Id,
-                        Kolicina = kolicina,
-                        CijenaUTrenutkuNarudzbe = usluga.Cijena
-                    });
-                }
+                int kolicina = (textBox != null && int.TryParse(textBox.Text, out int k)) ? k : 1;
+                odabraneStavke.Add(new StavkaNarudzbe { UslugaId = usluga.Id, Kolicina = kolicina, CijenaUTrenutkuNarudzbe = usluga.Cijena });
             }
         }
 
-        if (odabraneStavke.Count == 0)
-        {
-            MessageBox.Show("Molimo odaberite barem jednu uslugu!");
-            return;
-        }
+        if (odabraneStavke.Count == 0) { MessageBox.Show("Odaberite uslugu!"); return; }
 
+        // 2. Kreiraj objekt narudžbe
         var novaNarudzba = new Narudzba
         {
             KlijentEmail = UserSession.TrenutniEmail,
             DatumNarudzbe = DateTime.Now,
-            TerminDostave = DateTime.Now.AddDays(2),
             Adresa = (pnlAdresa.Visibility == Visibility.Visible) ? txtAdresa.Text : "N/A",
-    PotrebnaDostava = chkDostava.IsChecked ?? false,
-    Stavke = odabraneStavke
+            PotrebnaDostava = chkDostava.IsChecked ?? false,
+            Stavke = odabraneStavke
         };
 
+        // 3. Pošalji na API
         try
         {
             var response = await _httpClient.PostAsJsonAsync("api/narudzbe", novaNarudzba);
             if (response.IsSuccessStatusCode)
             {
                 MessageBox.Show("Narudžba uspješno kreirana!");
-                this.DialogResult = true;
+                this.DialogResult = true; // Ovo zatvara prozor i vraća 'true' u MainWindow
                 this.Close();
             }
             else
             {
-                var error = await response.Content.ReadAsStringAsync();
-                MessageBox.Show($"Greška pri slanju: {error}");
+                var err = await response.Content.ReadAsStringAsync();
+                MessageBox.Show($"Greška: {err}");
             }
         }
-        catch (Exception ex) { MessageBox.Show(ex.Message); }
+        catch (Exception ex) { MessageBox.Show($"Greška: {ex.Message}"); }
+    }
+
+    private void Izracunaj_Event(object sender, RoutedEventArgs e) => IzracunajUkupno();
+
+    private void ProvjeriAdresu(object sender, RoutedEventArgs e)
+    {
+        pnlAdresa.Visibility = (chkPrikup.IsChecked == true || chkDostava.IsChecked == true) 
+                               ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void IzracunajUkupno()
     {
         decimal ukupno = 0;
-
         foreach (var item in icUsluge.Items)
         {
             var container = icUsluge.ItemContainerGenerator.ContainerFromItem(item) as FrameworkElement;
             if (container == null) continue;
-
             var checkBox = FindVisualChild<CheckBox>(container);
             var textBox = FindVisualChild<TextBox>(container);
-
-            if (checkBox != null && checkBox.IsChecked == true)
+            if (checkBox?.IsChecked == true)
             {
                 var usluga = item as UslugaPeglanja;
-                int kolicina = 1;
-
-                if (textBox != null && int.TryParse(textBox.Text, out int parsedKolicina))
-                    kolicina = parsedKolicina;
-
-                if (usluga != null)
-                    ukupno += (usluga.Cijena * kolicina);
+                int kolicina = (textBox != null && int.TryParse(textBox.Text, out int k)) ? k : 1;
+                if (usluga != null) ukupno += (usluga.Cijena * kolicina);
             }
         }
-
         txtUkupnaCijena.Text = ukupno.ToString("F2") + " €";
     }
 

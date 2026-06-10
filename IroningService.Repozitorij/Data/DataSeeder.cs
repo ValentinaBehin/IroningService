@@ -7,7 +7,7 @@ namespace IroningService.Repozitorij.Data;
 
 public static class DataSeeder
 {
-    public static void SeedUsluge(RepozitorijContext context)
+    public static void Seed(RepozitorijContext context)
     {
         if (context.Usluge.Any()) return;
 

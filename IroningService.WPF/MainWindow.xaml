@@ -24,8 +24,25 @@
         </StackPanel>
 
         <DataGrid x:Name="MyDataGrid" 
-                  AutoGenerateColumns="True" 
-                  Margin="10" 
-                  Grid.Row="1"/>
+                  AutoGenerateColumns="False" 
+                  CanUserAddRows="False" 
+                  Grid.Row="1" 
+                  Margin="10">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Datum" Binding="{Binding DatumNarudzbe}" Width="Auto" />
+                <DataGridTextColumn Header="Adresa" Binding="{Binding Adresa}" Width="*" />
+                <DataGridCheckBoxColumn Header="Dostava" Binding="{Binding PotrebnaDostava}" Width="Auto" />
+                
+                <DataGridTemplateColumn Header="Akcije" Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                                <Button Content="Pregled" Click="BtnPregled_Click" Margin="0,0,0,2"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>

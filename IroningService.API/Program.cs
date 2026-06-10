@@ -6,29 +6,14 @@ using IroningService.Servis.Suclja;
 using Microsoft.EntityFrameworkCore;
 using IroningService.Blazor.Components;
 
-var tempBuilder = WebApplication.CreateBuilder(args);
-var connString = tempBuilder.Configuration.GetConnectionString("DefaultConnection");
-Console.WriteLine("--------------------------------------------------");
-Console.WriteLine($"KORISTIM OVAJ STRING: {connString}");
-Console.WriteLine("--------------------------------------------------");
-
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. LOGGING
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
-
-// Baza podataka
+// 1. POVEZIVANJE BAZE
+var connString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<RepozitorijContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(connString));
 
-// HttpClient
-builder.Services.AddScoped(sp => new HttpClient { 
-    BaseAddress = new Uri(builder.Configuration.GetValue<string>("ApiBaseUrl") ?? "http://localhost:5038") 
-});
-
-// REGISTRACIJA REPOZITORIJA I SERVISA
+// 2. REGISTRACIJA SERVISA I REPOZITORIJA
 builder.Services.AddScoped<IUslugaRepozitorij, UslugaRepozitorij>();
 builder.Services.AddScoped<INarudzbaRepozitorij, NarudzbaRepozitorij>();
 builder.Services.AddScoped<IKorisnikRepozitorij, KorisnikRepozitorij>();
@@ -36,66 +21,46 @@ builder.Services.AddScoped<IRecenzijaRepozitorij, RecenzijaRepozitorij>();
 builder.Services.AddScoped<IUslugaServis, UslugaServis>();
 builder.Services.AddScoped<INarudzbaServis, NarudzbaServis>();
 builder.Services.AddScoped<IKorisnikServis, KorisnikServis>();
-
-// AUTHENTICATION
-builder.Services.AddAuthentication("Cookies")
-    .AddCookie("Cookies", options => {
-        options.LoginPath = "/Login";
-        options.AccessDeniedPath = "/AccessDenied";
-    });
-
-// Blazor i Kontroleri
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
-
+builder.Services.AddScoped<IRecenzijaServis, RecenzijaServis>();
+// 3. OSTALO
 builder.Services.AddControllers();
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 var app = builder.Build();
 
-// 2. ERROR HANDLING MIDDLEWARE
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    app.UseHsts();
-}
-else
-{
-    app.UseDeveloperExceptionPage();
-}
-
-// 3. INICIJALIZACIJA BAZE
+// 4. INICIJALIZACIJA BAZE I SEEDANJE (KLJUČNI DIO)
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<RepozitorijContext>();
     
-    // Ovo će kreirati bazu i tablice prema tvom modelu
+    // Kreira tablice ako ne postoje
     context.Database.EnsureCreated(); 
-}
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<RepozitorijContext>();
-    try {
-        if (context.Database.CanConnect()) {
-            Console.WriteLine("USPJEH: Baza je dostupna!");
-        } else {
-            Console.WriteLine("GREŠKA: Ne mogu se spojiti na bazu!");
-        }
-    } catch (Exception ex) {
-        Console.WriteLine($"KRITIČNA GREŠKA: {ex.Message}");
+    
+    // Provjera: ako nema usluga, pokreni seeder
+    if (!context.Usluge.Any()) 
+    {
+        Console.WriteLine(">>> Baza je prazna. Pokrećem DataSeeder...");
+        DataSeeder.Seed(context); 
+        Console.WriteLine(">>> Podaci su uspješno dodani.");
+    }
+    else
+    {
+        Console.WriteLine(">>> Baza već sadrži podatke, preskačem seedanje.");
     }
 }
 
-  //app.UseHttpsRedirection();
+// 5. MIDDLEWARE
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+
 app.UseStaticFiles();
 app.UseAntiforgery();
-
-// 4. AUTH MIDDLEWARE
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
-
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 app.MapControllers(); 
 
 app.Run();
