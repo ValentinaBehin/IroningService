@@ -18,7 +18,7 @@ public class RecenzijeController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> DodajRecenziju([FromBody] Recenzija recenzija)
+    public async Task<IActionResult> DodajRecenziju([FromBody] RecenzijaModel recenzija)
     {
         // 1. Logiraj da je zahtjev stigao
         _logger.LogInformation("Primljen zahtjev za spremanje recenzije za narudžbu: {Id}", recenzija?.NarudzbaId);

@@ -52,10 +52,7 @@ public class NarudzbeController : ControllerBase
 public async Task<ActionResult<Narudzba>> GetNarudzbaPoId(int id)
 {
     var narudzba = await _narudzbaServis.DohvatiNarudzbuPoIdAsync(id);
-
-    if (narudzba == null) 
-        return NotFound($"Narudžba s ID-om {id} nije pronađena.");
-
+    if (narudzba == null) return NotFound();
     return Ok(narudzba);
 }
 }

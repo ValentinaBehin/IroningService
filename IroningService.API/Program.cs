@@ -22,8 +22,9 @@ builder.Services.AddScoped<IUslugaServis, UslugaServis>();
 builder.Services.AddScoped<INarudzbaServis, NarudzbaServis>();
 builder.Services.AddScoped<IKorisnikServis, KorisnikServis>();
 builder.Services.AddScoped<IRecenzijaServis, RecenzijaServis>();
-// 3. OSTALO
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(x =>
+    x.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles);
+
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 var app = builder.Build();
