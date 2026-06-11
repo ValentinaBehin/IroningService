@@ -1,16 +1,15 @@
 <Window x:Class="IroningService.WPF.DetaljiNarudzbeWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Detalji narudžbe" Height="500" Width="400" WindowStartupLocation="CenterOwner"
-        >
+        Title="Detalji narudžbe" Height="500" Width="400" WindowStartupLocation="CenterOwner">
     
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="20">
-            <Button Name="btnOtvoriRecenziju" 
-                    Content="Ocijeni ovu narudžbu" 
-                    Click="BtnOtvoriRecenziju_Click" 
-                    Background="LightBlue" 
-                    Margin="0,0,0,15"/>
+            
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+                <Button Name="btnOtvoriRecenziju" Content="Ocijeni ovu narudžbu" Click="BtnOtvoriRecenziju_Click" Background="LightBlue" Margin="0,0,10,0"/>
+                <Button Content="Naplata" Click="BtnNaplata_Click" Background="LightGreen"/>
+            </StackPanel>
 
             <TextBlock Text="Pregled narudžbe" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
             
@@ -52,6 +51,13 @@
                 <TextBlock Text="Recenzija:" FontWeight="Bold" />
                 <TextBlock x:Name="txtRecenzijaPrikaz" TextWrapping="Wrap" />
             </StackPanel>
+            <TextBlock x:Name="txtStatusNaplate" 
+           Text="Ova narudžba je naplaćena" 
+           Foreground="Green" 
+           FontWeight="Bold" 
+           HorizontalAlignment="Center" 
+           Margin="0,10,0,0" 
+           Visibility="Collapsed"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10">
                 <TextBlock Text="Ukupno: " FontSize="16" FontWeight="Bold"/>

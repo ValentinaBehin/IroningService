@@ -30,6 +30,15 @@ public partial class DetaljiNarudzbeWindow : Window
             UcitajRecenziju(); 
         }
     }
+    private void BtnNaplata_Click(object sender, RoutedEventArgs e)
+{
+    NaplataWindow naplata = new NaplataWindow();
+    
+    if (naplata.ShowDialog() == true) 
+    {
+         txtStatusNaplate.Visibility = Visibility.Visible;
+    }
+}
 
     private async void UcitajRecenziju()
     {
