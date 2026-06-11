@@ -4,6 +4,6 @@ namespace IroningService.Servis.Suclja;
 
 public interface IRecenzijaServis
 {
-    Task DodajRecenziju(Recenzija recenzija);
-    Task<List<Recenzija>> DohvatiRecenzijeZaNarudzbuAsync(int narudzbaId);
+    Task DodajRecenziju(RecenzijaModel recenzija);
+    Task<List<RecenzijaModel>> DohvatiRecenzijeZaNarudzbuAsync(int narudzbaId);
 }

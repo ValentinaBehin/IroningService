@@ -5,7 +5,7 @@ namespace IroningService.Repozitorij.Suclja;
 
 public interface IRecenzijaRepozitorij
 {
-    Task DodajRecenzijuAsync(Recenzija recenzija);
+    Task DodajRecenzijuAsync(RecenzijaModel recenzija);
     Task SaveAsync(); 
-    Task<List<Recenzija>> DohvatiPoNarudzbiAsync(int narudzbaId);
+    Task<List<RecenzijaModel>> DohvatiPoNarudzbiAsync(int narudzbaId);
 }

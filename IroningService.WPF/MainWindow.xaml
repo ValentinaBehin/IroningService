@@ -4,13 +4,20 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Moje Narudžbe" Height="450" Width="800">
+        Title="Moje Narudžbe" Height="450" Width="800"
+        >
     
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        <Image Source="logo.png" 
+       Width="50" 
+       Height="50" 
+       Margin="10"
+       HorizontalAlignment="Left" 
+       VerticalAlignment="Top" />
 
         <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="10">
             <Button Name="btnNovaNarudzba" 

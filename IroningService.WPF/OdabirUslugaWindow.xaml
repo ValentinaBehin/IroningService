@@ -1,7 +1,8 @@
 <Window x:Class="IroningService.WPF.OdabirUslugaWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Odabir Usluga" Height="600" Width="400">
+        Title="Odabir Usluga" Height="600" Width="400"
+        >
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>

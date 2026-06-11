@@ -9,7 +9,6 @@ namespace IroningService.WPF;
 public partial class DetaljiNarudzbeWindow : Window
 {
     private readonly int _narudzbaId; 
-    // HttpClient bi idealno trebao biti statičan u aplikaciji, ali ostavljamo ovako radi jednostavnosti
     private readonly HttpClient _httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:5038/") };
 
     public DetaljiNarudzbeWindow(Narudzba narudzba)
@@ -19,7 +18,6 @@ public partial class DetaljiNarudzbeWindow : Window
         _narudzbaId = narudzba.NarudzbaId;
         this.DataContext = narudzba;
         
-        // Poziv učitavanja
         UcitajRecenziju(); 
     }
 
@@ -27,7 +25,6 @@ public partial class DetaljiNarudzbeWindow : Window
     {
         RecenzijaWindow prozor = new RecenzijaWindow(_narudzbaId);
         
-        // ShowDialog vraća true ako se postavi DialogResult = true
         if (prozor.ShowDialog() == true)
         {
             UcitajRecenziju(); 
@@ -38,31 +35,27 @@ public partial class DetaljiNarudzbeWindow : Window
     {
         try 
         {
-            // Pozivamo API jednom
             string url = $"api/narudzbe/{_narudzbaId}?t={DateTime.Now.Ticks}";
+            
             var narudzbaIzApi = await _httpClient.GetFromJsonAsync<Narudzba>(url);
             
-            // Logiramo za debugiranje (vidiš u Output prozoru VS-a)
-            System.Diagnostics.Debug.WriteLine($"API odziv: {narudzbaIzApi?.RecenzijaKomentar}");
-
             if (narudzbaIzApi != null)
             {
-                // Provjera je li polje NULL ili prazno
-                if (!string.IsNullOrEmpty(narudzbaIzApi.RecenzijaKomentar))
+                // Ovdje pristupamo objektu Recenzija umjesto direktnim poljima
+                if (narudzbaIzApi.Recenzija != null)
                 {
-                    txtRecenzijaPrikaz.Text = $"Ocjena: {narudzbaIzApi.RecenzijaOcjena}/5\nKomentar: {narudzbaIzApi.RecenzijaKomentar}";
+                    txtRecenzijaPrikaz.Text = $"Ocjena: {narudzbaIzApi.Recenzija.Ocjena}/5\nKomentar: {narudzbaIzApi.Recenzija.Komentar}";
                 }
                 else
                 {
-                    txtRecenzijaPrikaz.Text = "Nema još recenzije.";
+                    txtRecenzijaPrikaz.Text = "Nema recenzije za ovu narudžbu.";
                 }
             }
         }
         catch (Exception ex)
         {
-            txtRecenzijaPrikaz.Text = $"Greška: {ex.Message}";
-    System.Diagnostics.Debug.WriteLine($"DETALJI GREŠKE: {ex}");
-    }
+            txtRecenzijaPrikaz.Text = "Greška: " + ex.Message;
+        }
     }
 
     private void BtnZatvori_Click(object sender, RoutedEventArgs e) 

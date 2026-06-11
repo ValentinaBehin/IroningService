@@ -1,4 +1,3 @@
-using IroningService.Domena.Entiteti;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -15,9 +14,10 @@ public class Narudzba
     public string? Adresa { get; set; } 
     public bool PotrebnaDostava { get; set; }
     public decimal UkupnaCijena { get; set; }
+    
     public List<StavkaNarudzbe> Stavke { get; set; } = new();
-    [JsonPropertyName("recenzijaKomentar")]
-    public string? RecenzijaKomentar { get; set; }
-    [JsonPropertyName("recenzijaOcjena")]
-    public int? RecenzijaOcjena { get; set; }
+
+    // Dodajemo poveznicu na RecenzijaModel
+    [JsonPropertyName("recenzija")] 
+    public RecenzijaModel? Recenzija { get; set; }    
 }

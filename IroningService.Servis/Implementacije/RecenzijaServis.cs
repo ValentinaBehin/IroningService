@@ -13,19 +13,13 @@ public class RecenzijaServis : IRecenzijaServis
         _repo = repo;
     }
 
-    public async Task DodajRecenziju(Recenzija recenzija)
+    public async Task DodajRecenziju(RecenzijaModel recenzija)
     {
-        // Validacija
-        if (recenzija.Ocjena < 1 || recenzija.Ocjena > 5)
-        {
-            throw new ArgumentException("Ocjena mora biti između 1 i 5.");
-        }
-
-        await _repo.DodajRecenzijuAsync(recenzija); 
-    await _repo.SaveAsync();
+       await _repo.DodajRecenzijuAsync(recenzija);
+        await _repo.SaveAsync();
     }
 
-    public async Task<List<Recenzija>> DohvatiRecenzijeZaNarudzbuAsync(int narudzbaId)
+    public async Task<List<RecenzijaModel>> DohvatiRecenzijeZaNarudzbuAsync(int narudzbaId)
     {
         return await _repo.DohvatiPoNarudzbiAsync(narudzbaId);
     }

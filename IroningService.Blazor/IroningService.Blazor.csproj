@@ -1,15 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <ItemGroup>
-    <ProjectReference Include="..\IroningService.Repozitorij\IroningService.Repozitorij.csproj" />
-    <ProjectReference Include="..\IroningService.Servis\IroningService.Servis.csproj" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+    <RootNamespace>IroningService.Blazor</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IroningService.Domena\IroningService.Domena.csproj" />
+    <ProjectReference Include="..\IroningService.Repozitorij\IroningService.Repozitorij.csproj" />
+    <ProjectReference Include="..\IroningService.Servis\IroningService.Servis.csproj" />
+  </ItemGroup>
 
 </Project>

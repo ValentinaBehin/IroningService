@@ -11,13 +11,12 @@ public class RepozitorijContext : DbContext
     public DbSet<UslugaPeglanja> Usluge { get; set; } 
     public DbSet<Narudzba> Narudzbe { get; set; }
     public DbSet<StavkaNarudzbe> StavkeNarudzbe { get; set; }
-    public DbSet<Recenzija> Recenzije { get; set; }
+    public DbSet<RecenzijaModel> Recenzije { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         
-        // --- KLJUČNI DIO ZA RJEŠAVANJE IDENTITY GREŠKE ---
         modelBuilder.Entity<Korisnik>()
             .Property(k => k.Id)
             .ValueGeneratedOnAdd();
@@ -27,8 +26,13 @@ public class RepozitorijContext : DbContext
             .HasPrecision(18, 2);
 
         modelBuilder.Entity<Narudzba>()
-            .Property(n => n.UkupnaCijena)
-            .HasPrecision(18, 2);
+    .Property(n => n.UkupnaCijena)
+    .HasPrecision(18, 2);
+
+modelBuilder.Entity<Narudzba>()
+        .HasOne(n => n.Recenzija)
+        .WithOne( )
+        .HasForeignKey<RecenzijaModel>(r => r.NarudzbaId);
 
         modelBuilder.Entity<StavkaNarudzbe>()
             .Property(s => s.CijenaUTrenutkuNarudzbe)
