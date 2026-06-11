@@ -48,4 +48,14 @@ public class NarudzbeController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
+[HttpGet("{id}")]
+public async Task<ActionResult<Narudzba>> GetNarudzbaPoId(int id)
+{
+    var narudzba = await _narudzbaServis.DohvatiNarudzbuPoIdAsync(id);
+
+    if (narudzba == null) 
+        return NotFound($"Narudžba s ID-om {id} nije pronađena.");
+
+    return Ok(narudzba);
+}
 }

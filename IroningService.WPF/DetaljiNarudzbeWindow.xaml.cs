@@ -9,60 +9,60 @@ namespace IroningService.WPF;
 public partial class DetaljiNarudzbeWindow : Window
 {
     private readonly int _narudzbaId; 
+    // HttpClient bi idealno trebao biti statičan u aplikaciji, ali ostavljamo ovako radi jednostavnosti
     private readonly HttpClient _httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:5038/") };
 
     public DetaljiNarudzbeWindow(Narudzba narudzba)
     {
         InitializeComponent();
         
-        // 1. Pohrani ID za kasniji poziv API-ja
         _narudzbaId = narudzba.NarudzbaId;
-        
-        // 2. Postavi DataContext za postojeće vezivanje (Datum, Adresa, Stavke...)
         this.DataContext = narudzba;
         
-        // 3. Učitaj dodatne podatke (recenziju) s API-ja
+        // Poziv učitavanja
         UcitajRecenziju(); 
+    }
+
+    private void BtnOtvoriRecenziju_Click(object sender, RoutedEventArgs e)
+    {
+        RecenzijaWindow prozor = new RecenzijaWindow(_narudzbaId);
+        
+        // ShowDialog vraća true ako se postavi DialogResult = true
+        if (prozor.ShowDialog() == true)
+        {
+            UcitajRecenziju(); 
+        }
     }
 
     private async void UcitajRecenziju()
     {
         try 
         {
-            // Ovdje šaljemo zahtjev na API. Ako dobiješ 404, provjeri u svom 
-            // API kontroleru imaš li metodu koja odgovara na: GET api/narudzbe/{id}
-            var narudzbaIzApi = await _httpClient.GetFromJsonAsync<Narudzba>($"api/narudzbe/{_narudzbaId}");
+            // Pozivamo API jednom
+            string url = $"api/narudzbe/{_narudzbaId}?t={DateTime.Now.Ticks}";
+            var narudzbaIzApi = await _httpClient.GetFromJsonAsync<Narudzba>(url);
             
+            // Logiramo za debugiranje (vidiš u Output prozoru VS-a)
+            System.Diagnostics.Debug.WriteLine($"API odziv: {narudzbaIzApi?.RecenzijaKomentar}");
+
             if (narudzbaIzApi != null)
             {
-                // Provjeri u klasi Narudzba da li se polje zove točno 'RecenzijaKomentar'
-                // Ako je prazno, prikaži poruku
-                txtRecenzijaPrikaz.Text = !string.IsNullOrEmpty(narudzbaIzApi.RecenzijaKomentar) 
-                                          ? narudzbaIzApi.RecenzijaKomentar 
-                                          : "Nema još recenzije.";
+                // Provjera je li polje NULL ili prazno
+                if (!string.IsNullOrEmpty(narudzbaIzApi.RecenzijaKomentar))
+                {
+                    txtRecenzijaPrikaz.Text = $"Ocjena: {narudzbaIzApi.RecenzijaOcjena}/5\nKomentar: {narudzbaIzApi.RecenzijaKomentar}";
+                }
+                else
+                {
+                    txtRecenzijaPrikaz.Text = "Nema još recenzije.";
+                }
             }
-        }
-        catch (HttpRequestException ex)
-        {
-            // 404 greška često znači da URL nije ispravan ili resurs ne postoji
-            // Ovdje možemo biti tihi ako recenzija nije obavezna
-            System.Diagnostics.Debug.WriteLine($"Greška pri dohvaćanju: {ex.Message}");
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Greška pri učitavanju recenzije: " + ex.Message);
-        }
+            txtRecenzijaPrikaz.Text = $"Greška: {ex.Message}";
+    System.Diagnostics.Debug.WriteLine($"DETALJI GREŠKE: {ex}");
     }
-
-    private void BtnOtvoriRecenziju_Click(object sender, RoutedEventArgs e)
-    {
-        RecenzijaWindow prozor = new RecenzijaWindow(_narudzbaId);
-        bool? rezultat = prozor.ShowDialog();
-        // Ako je korisnik uspješno spremio recenziju
-        if (rezultat == true)
-        {
-            UcitajRecenziju(); // Osvježi prikaz
-        }
     }
 
     private void BtnZatvori_Click(object sender, RoutedEventArgs e) 

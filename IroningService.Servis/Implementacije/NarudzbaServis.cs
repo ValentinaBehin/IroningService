@@ -78,4 +78,19 @@ public class NarudzbaServis : INarudzbaServis
         narudzba.UkupnaCijena = await IzracunajUkupnuCijenu(narudzba.Stavke);
         await _narudzbaRepo.DodajNarudzbuAsync(narudzba);
     }
+    
+public async Task<Narudzba?> DohvatiNarudzbuPoIdAsync(int id)
+{
+    // 1. Sigurna provjera konteksta
+    if (_context == null) 
+        throw new InvalidOperationException("Kontekst baze nije inicijaliziran.");
+
+    // 2. Dohvaćanje s uključivanjem stavki i usluga
+    var narudzba = await _context.Narudzbe
+        .Include(n => n.Stavke)
+            .ThenInclude(s => s.Usluga) // Važno za učitavanje podataka o uslugama
+        .FirstOrDefaultAsync(n => n.NarudzbaId == id);
+
+    return narudzba;
+}
 }
