@@ -41,7 +41,7 @@ public class NarudzbeController : ControllerBase
         return Ok(narudzba);
     }
 
-[HttpGet]
+[HttpGet("paginirano")]
 public async Task<IActionResult> GetPaginirano(int korisnikId, int pageNumber = 1, int pageSize = 10)
 {
     var narudzbe = await _narudzbaServis.DohvatiSvePaginirano(korisnikId, pageNumber, pageSize);
