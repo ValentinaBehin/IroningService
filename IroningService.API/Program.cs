@@ -8,12 +8,10 @@ using IroningService.Blazor.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. POVEZIVANJE BAZE
 var connString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<RepozitorijContext>(options =>
     options.UseSqlServer(connString));
 
-// 2. REGISTRACIJA SERVISA I REPOZITORIJA
 builder.Services.AddScoped<IUslugaRepozitorij, UslugaRepozitorij>();
 builder.Services.AddScoped<INarudzbaRepozitorij, NarudzbaRepozitorij>();
 builder.Services.AddScoped<IKorisnikRepozitorij, KorisnikRepozitorij>();
@@ -27,17 +25,17 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
-// 4. INICIJALIZACIJA BAZE I SEEDANJE (KLJUČNI DIO)
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<RepozitorijContext>();
     
-    // Kreira tablice ako ne postoje
     context.Database.EnsureCreated(); 
     
-    // Provjera: ako nema usluga, pokreni seeder
     if (!context.Usluge.Any()) 
     {
         Console.WriteLine(">>> Baza je prazna. Pokrećem DataSeeder...");
@@ -50,10 +48,15 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// 5. MIDDLEWARE
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
+}
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(); 
 }
 
 app.UseStaticFiles();

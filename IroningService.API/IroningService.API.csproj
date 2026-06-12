@@ -14,4 +14,8 @@
     <ProjectReference Include="..\IroningService.Blazor\IroningService.Blazor.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.1" />
+  </ItemGroup>
+
 </Project>
