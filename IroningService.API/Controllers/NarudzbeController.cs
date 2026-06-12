@@ -15,8 +15,8 @@ public class NarudzbeController : ControllerBase
         _narudzbaServis = narudzbaServis;
     }
 
-    // GET: api/narudzbe/po-emailu?email=...
-    [HttpGet("po-emailu")]
+    // GET: api/narudzbe?email=...
+    [HttpGet]
     public async Task<ActionResult<IEnumerable<Narudzba>>> GetPoEmailu([FromQuery] string email)
     {
         if (string.IsNullOrEmpty(email)) return BadRequest("Email je obavezan.");
@@ -41,12 +41,13 @@ public class NarudzbeController : ControllerBase
         return Ok(narudzba);
     }
 
-[HttpGet("paginirano")]
-public async Task<IActionResult> GetPaginirano(int korisnikId, int pageNumber = 1, int pageSize = 10)
-{
-    var narudzbe = await _narudzbaServis.DohvatiSvePaginirano(korisnikId, pageNumber, pageSize);
-    return Ok(narudzbe);
-}
+    // GET: api/narudzbe/paginirano?korisnikId=...&pageNumber=...&pageSize=...
+    [HttpGet("paginirano")]
+    public async Task<IActionResult> GetPaginirano([FromQuery] int korisnikId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    {
+        var narudzbe = await _narudzbaServis.DohvatiSvePaginirano(korisnikId, pageNumber, pageSize);
+        return Ok(narudzbe);
+    }
 
     // POST: api/narudzbe
     [HttpPost]
